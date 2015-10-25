@@ -1,0 +1,4 @@
+[Project]
+Name=SkeletonVisualizer
+Manager=KDevCMakeManager
+VersionControl=kdevgit
