@@ -124,7 +124,7 @@ Vector SkeletonVisualizer::skeletonBoneEnd()
 }
 
 bool SkeletonVisualizer::checkSelectDeselectAllVertices(const Vector& mousePt)
-{
+{ // return value informs, whether a point was selected
   for (Bone b : skeleton->bones)
   {
     if (checkSelectDeselectVertice(mousePt, b.endPoint())) return true;
