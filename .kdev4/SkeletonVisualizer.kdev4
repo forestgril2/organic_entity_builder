@@ -7,7 +7,7 @@ Current Build Directory Index=0
 ProjectRootRelative=./
 
 [CMake][CMake Build Directory 0]
-Build Directory Path=file:///home/rsteam/Projects/SkeletonVisualizer/build
+Build Directory Path=file:///home/space/Projects/SkeletonVisualizer/build
 Build Type=Debug
 CMake Binary=file:///usr/bin/cmake
 Environment Profile=
@@ -33,7 +33,7 @@ Arguments=
 Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x02\x00\x00\x00$\x00S\x00k\x00e\x00l\x00e\x00t\x00o\x00n\x00V\x00i\x00s\x00u\x00a\x00l\x00i\x00z\x00e\x00r\x00\x00\x00$\x00s\x00k\x00e\x00l\x00e\x00t\x00o\x00n\x00v\x00i\x00s\x00u\x00a\x00l\x00i\x00z\x00e\x00r)
 Dependency Action=Build
 EnvironmentGroup=
-Executable=file:///home/rsteam/Projects/SkeletonVisualizer/
+Executable=file:///home/space/Projects/SkeletonVisualizer/
 External Terminal=konsole --noclose --workdir %workdir -e %exe
 Project Target=SkeletonVisualizer,skeletonvisualizer
 Use External Terminal=false

@@ -94,6 +94,4 @@ private:
   double h;
 };
 
-
-
 #endif // SkeletonVisualizer_H
