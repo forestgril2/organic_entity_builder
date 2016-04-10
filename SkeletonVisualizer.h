@@ -15,6 +15,7 @@ public:
   Vector(const Point& p) : Point(p) {};
   Vector(double x, double y) : Point(x, y) {};
   double length() {return sqrt(x()*x() + y()*y());};
+  void rotate(double radians) {};
 };
 
 struct Bone
@@ -30,6 +31,7 @@ struct Bone
   double y() const {return pos.y();};
   double endx() const {return pos.x() + cos(angle)*length;}; 
   double endy() const {return pos.y() - sin(angle)*length;};
+  Vector startPoint() const {return pos;};
   Vector endPoint() const {return Vector(endx(), endy());};
 
   void randPos(double max);
@@ -41,6 +43,17 @@ struct Bone
   Vector pos;
   double length;
   double angle; 
+};
+
+struct Body
+{
+  Body(Bone& b) : bone(b) {};
+  Body() : bone(Bone()) {};
+
+  void paint(QPainter* painter);
+
+private:
+  Bone bone;
 };
 
 class Skeleton
@@ -55,7 +68,7 @@ public:
 
 private:
   void paint(QPainter* painter) const;
-  
+  void paint_body(QPainter* painter) const;  
   void randomizeBones(double length);
   void initBones(double length);
   void addBone(Vector start, Vector end);
@@ -82,7 +95,7 @@ private:
   void initLabel();
   void initAction();
   Vector skeletonBoneEnd();
-    void centerSkeleton();
+  void centerSkeleton();
   bool checkSelectDeselectVertice(const Vector& mousePt, Vector endPoint);
   
   Skeleton* skeleton;
