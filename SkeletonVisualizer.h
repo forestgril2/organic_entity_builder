@@ -15,7 +15,13 @@ public:
   Vector(const Point& p) : Point(p) {};
   Vector(double x, double y) : Point(x, y) {};
   double length() {return sqrt(x()*x() + y()*y());};
-  void rotate(double radians) {};
+  void rotate(double radians) 
+  {
+    auto oldX = x();
+    auto oldY = y();
+    setX(cos(radians)* oldX -oldY * sin(radians)); 
+    setY(sin(radians)* oldX + oldY * cos(radians)); 
+  };
 };
 
 struct Bone

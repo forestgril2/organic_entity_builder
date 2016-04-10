@@ -156,7 +156,7 @@ bool SkeletonVisualizer::checkSelectDeselectVertice(const Vector&
 
 void Body::paint(QPainter* painter)
 {
-  auto f = [](double x){return 5;};
+  auto f = [](double x){return 15;};
   
   if (bone.length == 0) bone.length = 0.01; 
   
@@ -167,13 +167,17 @@ void Body::paint(QPainter* painter)
   auto boneStart = bone.startPoint();
   auto boneEnd = bone.endPoint();
 
-  //posCordFunc.rotate();
-  posCordCart = (boneStart + boneEnd)/2 + Point(0.0,f(0.0));
+  posCordFunc.rotate(-bone.angle);
+  posCordCart = (boneStart + boneEnd)/2 + posCordFunc;
+  
+  dPos = Vector(1.0, 0);
+  dPos.rotate(-bone.angle);
   
   while (posCordFunc.x() <= bone.length/2)// paint upper part pixel by pixel
   {
     //calculate (dx,dy)
-    dPos = Vector(1.0, 0);
+    //dPos = Vector(1.0, 0);
+    //dPos.rotate(-bone.angle);
     
     targetCordCart = posCordCart + dPos;
     auto rememberColor = painter->pen().color();
@@ -181,7 +185,29 @@ void Body::paint(QPainter* painter)
     painter->drawLine(posCordCart, targetCordCart);
     painter->setPen(rememberColor);
     posCordCart = targetCordCart; 
-    posCordFunc += dPos;
+    posCordFunc += Point(1.0, 0.0);;
+  } 
+  
+  posCordFunc = Vector(0.0,f(0.0));
+  posCordFunc.rotate(bone.angle);
+  posCordCart = (boneStart + boneEnd)/2 + posCordFunc;
+  
+  dPos = Vector(-1.0, 0);
+  dPos.rotate(-bone.angle);
+  
+  while (posCordFunc.x() <= bone.length/2)// paint upper part pixel by pixel
+  {
+    //calculate (dx,dy)
+    //dPos = Vector(1.0, 0);
+    //dPos.rotate(-bone.angle);
+    
+    targetCordCart = posCordCart + dPos;
+    auto rememberColor = painter->pen().color();
+    painter->setPen(Qt::darkGreen);
+    painter->drawLine(posCordCart, targetCordCart);
+    painter->setPen(rememberColor);
+    posCordCart = targetCordCart; 
+    posCordFunc += Point(1.0, 0.0);;
   } 
 }
 
