@@ -4,6 +4,7 @@ find_package(Qt4 REQUIRED)
 
 include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(CMAKE_CXX_FLAGS "-std=c++14")
 set(SkeletonVisualizer_SRCS SkeletonVisualizer.cpp main.cpp)
 
 qt4_automoc(${SkeletonVisualizer_SRCS})
