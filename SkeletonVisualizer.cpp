@@ -186,25 +186,17 @@ void Body::paint(QPainter* painter)
     painter->setPen(rememberColor);
     posCordCart = targetCordCart; 
     posCordFunc += Point(1.0, 0.0);;
-  } 
+  }
   
-  posCordFunc = Vector(0.0,f(0.0));
-  posCordFunc.rotate(bone.angle);
-  posCordCart = (boneStart + boneEnd)/2 + posCordFunc;
-  
-  dPos = Vector(-1.0, 0);
-  dPos.rotate(-bone.angle);
-  
-  while (posCordFunc.x() <= bone.length/2)// paint upper part pixel by pixel
+  while (posCordFunc.x() <= bone.length/2 + M_PI * f(posCordFunc.x()))// paint first circle half
   {
     //calculate (dx,dy)
-    //dPos = Vector(1.0, 0);
-    //dPos.rotate(-bone.angle);
+    dPos.rotate(-asin(1.0/f(posCordFunc.x())));
     
     targetCordCart = posCordCart + dPos;
     auto rememberColor = painter->pen().color();
     painter->setPen(Qt::darkGreen);
-    painter->drawLine(posCordCart, targetCordCart);
+    //painter->drawLine(posCordCart, targetCordCart);
     painter->setPen(rememberColor);
     posCordCart = targetCordCart; 
     posCordFunc += Point(1.0, 0.0);;
