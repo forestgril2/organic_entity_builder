@@ -154,53 +154,88 @@ bool SkeletonVisualizer::checkSelectDeselectVertice(const Vector&
     return false;
 }
 
+void Body::drawLineGivenColor(const QColor& c, Point a, Point b, QPainter* painter)
+{
+  auto rememberColor = painter->pen().color();
+  painter->setPen(Qt::darkGreen);
+  painter->drawLine(a, b);
+  painter->setPen(rememberColor);
+}
+
+void Body::paintSide(auto& posCordFunc, auto& target, auto& targetCordCart, auto& posCordCart, auto& dPos, auto& painter)
+{
+  while (posCordFunc.x() <= target) // paint upper part pixel by pixel
+  {
+    //calculate (dx,dy)
+    //dPos = Vector(1.0, 0);
+    //dPos.rotate(-bone.angle);
+    targetCordCart = posCordCart + dPos;
+    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
+    posCordCart = targetCordCart;
+    posCordFunc += Point(1.0, 0.0);;
+  }
+}
+
+
+void Body::paintArc(auto& target, auto& f, auto& posCordFunc, auto& dPos, auto& targetCordCart, auto& posCordCart, auto& painter)
+{
+  target += M_PI * f(posCordFunc.x());
+  while (posCordFunc.x() <= target) // paint first circle half
+  {
+    //calculate (dx,dy)
+    auto arc = 1.0 / (f(posCordFunc.x()));
+    auto posRadius = Vector(posCordCart - bone.endPoint());
+    posRadius.rotate(-asin(arc));
+    targetCordCart = bone.endPoint() + posRadius;
+    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
+    posCordCart = targetCordCart; 
+    posCordFunc += Point(1.0, 0.0);
+  }
+  
+  if (posCordFunc.x() > target)
+  {
+    //calculate (dx,dy)
+    auto arc = (target - posCordFunc.x()) / (f(posCordFunc.x()));
+    auto posRadius = Vector(posCordCart - bone.endPoint());
+    posRadius.rotate(-asin(arc));
+    targetCordCart = bone.endPoint() + posRadius;
+    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
+    posCordCart = targetCordCart;
+    posCordFunc += Point(1.0, 0.0);
+  }
+  
+  dPos = -dPos;
+}
+
+
 void Body::paint(QPainter* painter)
 {
-  auto f = [](double x){return 15;};
+  auto f = [](double x){return 5;};
   
   if (bone.length == 0) bone.length = 0.01; 
   
   auto posCordCart = Point(0.0, 0.0);
   auto targetCordCart = Point(0.0, 0.0);
   auto posCordFunc = Vector(0.0,f(0.0));
+  auto posCordFuncCopy = posCordFunc;
   auto dPos = Vector(0.0, 0.0);
   auto boneStart = bone.startPoint();
   auto boneEnd = bone.endPoint();
 
-  posCordFunc.rotate(-bone.angle);
-  posCordCart = (boneStart + boneEnd)/2 + posCordFunc;
+  posCordFuncCopy.rotate(-bone.angle);
+  posCordCart = (boneStart + boneEnd)/2 + posCordFuncCopy;
   
   dPos = Vector(1.0, 0);
   dPos.rotate(-bone.angle);
   
-  while (posCordFunc.x() <= bone.length/2)// paint upper part pixel by pixel
-  {
-    //calculate (dx,dy)
-    //dPos = Vector(1.0, 0);
-    //dPos.rotate(-bone.angle);
-    
-    targetCordCart = posCordCart + dPos;
-    auto rememberColor = painter->pen().color();
-    painter->setPen(Qt::darkGreen);
-    painter->drawLine(posCordCart, targetCordCart);
-    painter->setPen(rememberColor);
-    posCordCart = targetCordCart; 
-    posCordFunc += Point(1.0, 0.0);;
-  }
-  
-  while (posCordFunc.x() <= bone.length/2 + M_PI * f(posCordFunc.x()))// paint first circle half
-  {
-    //calculate (dx,dy)
-    dPos.rotate(-asin(1.0/f(posCordFunc.x())));
-    
-    targetCordCart = posCordCart + dPos;
-    auto rememberColor = painter->pen().color();
-    painter->setPen(Qt::darkGreen);
-    //painter->drawLine(posCordCart, targetCordCart);
-    painter->setPen(rememberColor);
-    posCordCart = targetCordCart; 
-    posCordFunc += Point(1.0, 0.0);;
-  } 
+  double target = bone.length/2;
+  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
+  paintArc(target, f, posCordFunc, dPos, targetCordCart, posCordCart, painter);
+  target += bone.length;
+  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
+  paintArc(target, f, posCordFunc, dPos, targetCordCart, posCordCart, painter);
+  target += bone.length/2;
+  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
 }
 
 void Skeleton::paint(QPainter* painter) const

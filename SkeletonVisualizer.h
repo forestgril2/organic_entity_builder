@@ -17,9 +17,9 @@ public:
   double length() {return sqrt(x()*x() + y()*y());};
   void rotate(double radians) 
   {
-    auto oldX = x();
-    auto oldY = y();
-    setX(cos(radians)* oldX -oldY * sin(radians)); 
+    double oldX = x();
+    double oldY = y();
+    setX(cos(radians)* oldX - oldY * sin(radians)); 
     setY(sin(radians)* oldX + oldY * cos(radians)); 
   };
 };
@@ -60,6 +60,9 @@ struct Body
 
 private:
   Bone bone;
+    void drawLineGivenColor(const QColor& c, Point a, Point b, QPainter* painter);
+    void paintArc(auto& target, auto& f, auto& posCordFunc, auto& dPos, auto& targetCordCart, auto& posCordCart, auto& painter);
+    void paintSide(auto& posCordFunc, auto& target, auto& targetCordCart, auto& posCordCart, auto& dPos, auto& painter);
 };
 
 class Skeleton
