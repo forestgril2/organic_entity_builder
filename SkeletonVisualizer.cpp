@@ -162,60 +162,6 @@ void Body::drawLineGivenColor(const QColor& c, Point a, Point b, QPainter* paint
   painter->setPen(rememberColor);
 }
 
-void Body::paintSide(auto& posCordFunc, auto& target, auto& targetCordCart, auto& posCordCart, auto& dPos, auto& painter)
-{
-  while (posCordFunc.x() <= target) // paint upper part pixel by pixel
-  {
-    //calculate (dx,dy)
-    targetCordCart = posCordCart + dPos;
-    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
-    posCordCart = targetCordCart;
-    posCordFunc += Point(1.0, 0.0);
-  }
-  
-  if (posCordFunc.x() > target)
-  {
-    auto dPosFunFin = Point(posCordFunc.x() - target, 0.0);
-    targetCordCart = posCordCart + Point(posCordFunc.x() - target, 0.0);
-    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
-    posCordCart = targetCordCart;
-    posCordFunc += dPosFunFin;
-  }
-}
-
-
-void Body::paintArc(auto center, auto& target, auto& f, auto& posCordFunc, auto& dPos, auto& targetCordCart, auto& posCordCart, auto& painter)
-{
-  target += M_PI * f(posCordFunc.x());
-  while (posCordFunc.x() <= target)
-  {
-    //calculate (dx,dy)
-    auto arc = 1.0 / (f(posCordFunc.x()));
-    auto posRadius = Vector(posCordCart - center);
-    posRadius.rotate(-asin(arc));
-    targetCordCart = center + posRadius;
-    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
-    posCordCart = targetCordCart; 
-    posCordFunc += Point(1.0, 0.0);
-  }
-  
-  if (posCordFunc.x() > target)
-  {
-    //calculate (dx,dy)
-    auto arc = (target - posCordFunc.x()) / (f(posCordFunc.x()));
-    auto dPosFunFin = Point(posCordFunc.x() - target, 0.0);
-    auto posRadius = Vector(posCordCart - center);
-    posRadius.rotate(-asin(arc));
-    targetCordCart = center + posRadius;
-    drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
-    posCordCart = targetCordCart;
-    posCordFunc += dPosFunFin;
-  }
-  
-  dPos = -dPos;
-}
-
-
 void Body::paint(QPainter* painter)
 {
   auto f = [](double x){return 15;};
@@ -236,14 +182,67 @@ void Body::paint(QPainter* painter)
   dPos = Vector(1.0, 0);
   dPos.rotate(-bone.angle);
   
+  auto paintSide = [this](auto& _posCordFunc, auto& _f, auto& _target, auto& _targetCordCart, auto& _posCordCart, auto& _dPos, auto& _painter)
+  {
+    while (_posCordFunc.x() <= _target) // paint upper part pixel by pixel
+    {
+      //calculate (dx,dy)
+      //dPos = Vector
+      _targetCordCart = _posCordCart + _dPos;
+      drawLineGivenColor(Qt::darkGreen, _posCordCart, _targetCordCart, _painter);
+      _posCordCart = _targetCordCart;
+      _posCordFunc += Point(1.0, 0.0);
+    }
+    
+    if (_posCordFunc.x() > _target)
+    {
+      auto dPosFunFin = Point(_posCordFunc.x() - _target, 0.0);
+      _targetCordCart = _posCordCart + Point(_posCordFunc.x() - _target, 0.0);
+      drawLineGivenColor(Qt::darkGreen, _posCordCart, _targetCordCart, _painter);
+      _posCordCart = _targetCordCart;
+      _posCordFunc += dPosFunFin;
+    }
+  };
+  
+  auto paintArc = [this](auto center, auto& target, auto& f, auto& posCordFunc, auto& dPos, auto& targetCordCart, auto& posCordCart, auto& painter)
+  {
+    target += M_PI * f(posCordFunc.x());
+    while (posCordFunc.x() <= target)
+    {
+      //calculate (dx,dy)
+      auto arc = 1.0 / (f(posCordFunc.x()));
+      auto posRadius = Vector(posCordCart - center);
+      posRadius.rotate(-asin(arc));
+      targetCordCart = center + posRadius;
+      drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
+      posCordCart = targetCordCart; 
+      posCordFunc += Point(1.0, 0.0);
+    }
+    
+    if (posCordFunc.x() > target)
+    {
+      //calculate (dx,dy)
+      auto arc = (target - posCordFunc.x()) / (f(posCordFunc.x()));
+      auto dPosFunFin = Point(posCordFunc.x() - target, 0.0);
+      auto posRadius = Vector(posCordCart - center);
+      posRadius.rotate(-asin(arc));
+      targetCordCart = center + posRadius;
+      drawLineGivenColor(Qt::darkGreen, posCordCart, targetCordCart, painter);
+      posCordCart = targetCordCart;
+      posCordFunc += dPosFunFin;
+    }
+    
+    dPos = -dPos;
+  };
+  
   double target = bone.length/2;
-  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
+  paintSide(posCordFunc, f, target, targetCordCart, posCordCart, dPos, painter);
   paintArc(bone.endPoint(), target, f, posCordFunc, dPos, targetCordCart, posCordCart, painter);
   target += bone.length;
-  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
+  paintSide(posCordFunc, f, target, targetCordCart, posCordCart, dPos, painter);
   paintArc(bone.startPoint(), target, f, posCordFunc, dPos, targetCordCart, posCordCart, painter);
   target += bone.length/2;
-  paintSide(posCordFunc, target, targetCordCart, posCordCart, dPos, painter);
+  paintSide(posCordFunc, f, target, targetCordCart, posCordCart, dPos, painter);
 }
 
 void Skeleton::paint(QPainter* painter) const

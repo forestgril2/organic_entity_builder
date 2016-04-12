@@ -61,8 +61,6 @@ struct Body
 private:
   Bone bone;
     void drawLineGivenColor(const QColor& c, Point a, Point b, QPainter* painter);
-    void paintArc(auto center, auto& target, auto& f, auto& posCordFunc, auto& dPos, auto& targetCordCart, auto& posCordCart, auto& painter);
-    void paintSide(auto& posCordFunc, auto& target, auto& targetCordCart, auto& posCordCart, auto& dPos, auto& painter);
 };
 
 class Skeleton
