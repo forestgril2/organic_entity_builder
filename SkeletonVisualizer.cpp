@@ -176,7 +176,8 @@ void Body::paint(QPainter* painter)
   auto dPosFun = Vector(0.0, 0.0);
   auto boneStart = bone.startPoint();
   auto boneEnd = bone.endPoint();
-  auto arcAngleAdder = 0.0;
+  auto arcAngle = M_PI;
+  auto arcAngleTotal = 0.0;
 
   posFuncCopy.rotate(-bone.angle);
   posScr = (boneStart + boneEnd)/2 + posFuncCopy;
@@ -185,13 +186,13 @@ void Body::paint(QPainter* painter)
   {
     auto dy = dfXY(fXY, posFunc.x(), dx);
     dPosScr = dPosFun = Vector(dx, dy);
-    dPosScr.rotate(-bone.angle + arcAngleAdder);
+    dPosScr.rotate(-bone.angle + arcAngleTotal);
     drawLineGivenColor(Qt::darkGreen, posScr, posScr + dPosScr, painter);
     posScr += dPosScr;
     posFunc += dPosFun;
   };
   
-  auto drawAlong = [&,this](auto& targFunOX)
+  auto drawAlongSide = [&,this](auto& targFunOX)
   {
     while (posFunc.x() <= targFunOX) drawSegmAlong(1.0);
     if (posFunc.x() > targFunOX)
@@ -201,45 +202,45 @@ void Body::paint(QPainter* painter)
     }
   };
   
-  auto drawArc = [&,this](auto center, auto& targetLength)
+  auto drawAroundCenter = [&,this](auto center, auto targArc)
   {
-    targetLength += M_PI * fXY(posFunc.x());
-    while (posFunc.x() <= targetLength)
+    while (posFunc.x() <= targArc)
     {
-      //calculate (dx,dy)
+      auto dx = 1.0;
+      
       auto arc = 1.0 / (fXY(posFunc.x()));
       auto posRadius = Vector(posScr - center);
       posRadius.rotate(-asin(arc));
-      auto targScr = center + posRadius;
-      drawLineGivenColor(Qt::darkGreen, posScr, targScr, painter);
-      posScr = targScr; 
+      
+      drawLineGivenColor(Qt::darkGreen, posScr, center + posRadius, painter);
+      posScr = center + posRadius; 
       posFunc += Point(1.0, 0.0);
     }
     
-    if (posFunc.x() > targetLength)
+    if (posFunc.x() > targArc)
     {
       //calculate (dx,dy)
-      auto arc = (targetLength - posFunc.x()) / (fXY(posFunc.x()));
-      auto dPosFunFin = Point(posFunc.x() - targetLength, 0.0);
+      auto arc = (targArc - posFunc.x()) / (fXY(posFunc.x()));
+      auto dPosFunFin = Point(posFunc.x() - targArc, 0.0);
       auto posRadius = Vector(posScr - center);
+      
       posRadius.rotate(-asin(arc));
-      auto targScr = center + posRadius;
-      drawLineGivenColor(Qt::darkGreen, posScr, targScr, painter);
-      posScr = targScr;
+      drawLineGivenColor(Qt::darkGreen, posScr, center + posRadius, painter);
+      posScr = center + posRadius;
       posFunc += dPosFunFin;
     }
   };
   
   double targetCoordFuncOx = bone.length/2;
-  drawAlong(targetCoordFuncOx);
-  drawArc(bone.endPoint(), targetCoordFuncOx);
+  drawAlongSide(targetCoordFuncOx);
+  drawAroundCenter(bone.endPoint(), arcAngle);
+  arcAngleTotal += arcAngle;
   targetCoordFuncOx += bone.length;
-  arcAngleAdder += M_PI;
-  drawAlong(targetCoordFuncOx);
-  drawArc(bone.startPoint(), targetCoordFuncOx);
+  drawAlongSide(targetCoordFuncOx);
+  drawAroundCenter(bone.startPoint(), arcAngle);
+  arcAngleTotal += M_PI;
   targetCoordFuncOx += bone.length/2;
-  arcAngleAdder += M_PI;
-  drawAlong(targetCoordFuncOx);
+  drawAlongSide(targetCoordFuncOx);
 }
 
 void Skeleton::paint(QPainter* painter) const
