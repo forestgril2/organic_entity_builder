@@ -10,6 +10,8 @@
 
 #define PI 3.1415926535897932384626433832795028841971694
 #define SELRAD 5 //selection radius
+const unsigned int MSEC_PER_SEC = 1000;
+const double TIME_INTERVAL = 0.05;
 
 using namespace std;
 
@@ -26,6 +28,10 @@ SkeletonVisualizer::SkeletonVisualizer(Skeleton* s) : skeleton(s),
 {
     setGeometry(200, 200, w, h);
     centerSkeleton();
+    
+    updateTimer = new QTimer(this);
+    updateTimer->start(TIME_INTERVAL * MSEC_PER_SEC);
+    connect(updateTimer, SIGNAL(timeout()), this, SLOT(update()));
 
     initLabel();
     //initAction();
@@ -164,7 +170,9 @@ void Body::drawLineGivenColor(const QColor& c, Point a, Point b, QPainter* paint
 
 void Body::paint(QPainter* painter)
 {
-  auto fXY = [](double x){return 15+5*sin(0.2*x);};
+  qint64 counter = bone.lifeTimer.nsecsElapsed()/30000000;
+  
+  auto fXY = [&](double x){return 15+15*(sin(0.2*(x - counter))*sin(0.2*(x - counter)));};
   auto dfXY = [](auto funOxOy, double x, double dx){auto yPlus = funOxOy(x + dx); return yPlus - funOxOy(x);};
   
   if (bone.length == 0) bone.length = 0.01; 

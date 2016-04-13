@@ -4,6 +4,8 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QLabel>
+#include <QElapsedTimer>
+#include <QTimer>
 #include <math.h>
 #include <vector>
 
@@ -26,8 +28,8 @@ public:
 
 struct Bone
 {
-  Bone() : pos(Vector(0.0, 0.0)), length(0), angle(0) {};
-  Bone(Vector P, double l, double a) : pos(P), length(l), angle(a) {};
+  Bone() : pos(Vector(0.0, 0.0)), length(0), angle(0) {lifeTimer.start();};
+  Bone(Vector P, double l, double a) : pos(P), length(l), angle(a) {lifeTimer.start();};
 
   void move(Vector v) {pos = pos + v;};
   double setx(double x) {pos.setX(x);};
@@ -48,7 +50,9 @@ struct Bone
 
   Vector pos;
   double length;
-  double angle; 
+  double angle;
+  
+  QElapsedTimer lifeTimer;
 };
 
 struct Body
@@ -107,6 +111,7 @@ private:
   
   Skeleton* skeleton;
   QLabel* label;
+  QTimer* updateTimer;
 
   Point selectedVertice;
   bool isVerticeSelected;
